@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import type { RiskWeights, ApiKey } from "@/types/admin";
@@ -170,3 +171,33 @@ function AuditTab() {
     </div>
   );
 }
+=======
+import { useTranslation } from 'react-i18next';
+import AppLayout from '@/components/layout/AppLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const Admin = () => {
+  const { t } = useTranslation();
+
+  return (
+    <AppLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">{t('nav.admin')}</h1>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Administration</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">Admin features coming soon...</p>
+          </CardContent>
+        </Card>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default Admin;
+>>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7

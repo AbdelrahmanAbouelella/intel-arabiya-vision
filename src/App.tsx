@@ -10,11 +10,18 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Companies from "./pages/Companies";
+<<<<<<< HEAD
 import CompanyPage from "@/pages/Company";
 import CompanyProfile from "./pages/CompanyProfile";
 import Watchlists from "./pages/Watchlists";
 import AlertsPage from "@/pages/Alerts";
 import AdminPage from "@/pages/Admin";
+=======
+import CompanyProfile from "./pages/CompanyProfile";
+import Watchlists from "./pages/Watchlists";
+import Alerts from "./pages/Alerts";
+import Admin from "./pages/Admin";
+>>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -33,11 +40,18 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/companies" element={<ProtectedRoute><Companies /></ProtectedRoute>} />
+<<<<<<< HEAD
               <Route path="/company" element={<ProtectedRoute><CompanyPage /></ProtectedRoute>} />
               <Route path="/company/:id" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
               <Route path="/watchlists" element={<ProtectedRoute><Watchlists /></ProtectedRoute>} />
               <Route path="/alerts" element={<AlertsPage />} />
               <Route path="/admin" element={<AdminPage />} />
+=======
+              <Route path="/company/:id" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
+              <Route path="/watchlists" element={<ProtectedRoute><Watchlists /></ProtectedRoute>} />
+              <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+>>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
