@@ -1,17 +1,12 @@
 {
   "common": {
     "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
+    "view": "View",
+    "create": "Create",
     "save": "Save",
+    "cancel": "Cancel",
     "delete": "Delete",
-    "edit": "Edit",
-    "search": "Search",
-    "filter": "Filter",
-    "export": "Export",
-    "refresh": "Refresh",
-    "viewDetails": "View Details"
+    "edit": "Edit"
   },
   "auth": {
     "signIn": "Sign In",
@@ -47,30 +42,32 @@
     "recentEvents": "Recent Events",
     "topRiskCompanies": "Top Risk Companies"
   },
+  "companies": {
+    "title": "Companies",
+    "searchDescription": "Search and filter companies across KSA, UAE, and Egypt",
+    "searchPlaceholder": "Search by name, ticker, or ISIN...",
+    "allSectors": "All Sectors",
+    "allCountries": "All Countries",
+    "noResults": "No companies found",
+    "notFound": "Company not found"
+  },
   "company": {
     "overview": "Overview",
     "financials": "Financials",
     "events": "News & Events",
-    "filings": "Filings",
-    "people": "People",
-    "forecast": "Forecast",
-    "comparables": "Comparables",
+    "name": "Company Name",
     "ticker": "Ticker",
-    "isin": "ISIN",
     "sector": "Sector",
     "country": "Country",
+    "riskScore": "Risk Score",
+    "isin": "ISIN",
     "exchange": "Exchange",
     "marketCap": "Market Cap",
-    "riskScore": "Risk Score",
-    "revenue": "Revenue",
-    "ebitda": "EBITDA",
-    "netIncome": "Net Income",
-    "operatingMargin": "Operating Margin",
-    "netMargin": "Net Margin",
-    "roe": "ROE",
-    "debtToEquity": "Debt/Equity"
+    "website": "Website",
+    "description": "Description",
+    "noDescription": "No description available"
   },
-  "events": {
+  "eventTypes": {
     "earnings_release": "Earnings Release",
     "earnings_beat": "Earnings Beat",
     "earnings_miss": "Earnings Miss",
@@ -92,25 +89,51 @@
     "esg_event": "ESG Event",
     "other": "Other"
   },
-  "alerts": {
-    "title": "Alert Rules",
-    "createRule": "Create Alert Rule",
-    "ruleBuilder": "Rule Builder",
-    "testRule": "Test Rule",
-    "alertHistory": "Alert History",
-    "severity": {
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High",
-      "critical": "Critical"
-    }
-  },
   "watchlists": {
     "title": "Watchlists",
-    "createWatchlist": "Create Watchlist",
-    "addCompanies": "Add Companies",
     "myWatchlists": "My Watchlists",
-    "sharedWatchlists": "Shared Watchlists"
+    "description": "Organize and track companies of interest",
+    "create": "Create Watchlist",
+    "createNew": "Create New Watchlist",
+    "name": "Name",
+    "namePlaceholder": "e.g., High Risk Banks",
+    "descriptionPlaceholder": "Optional description",
+    "empty": "No watchlists created yet"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "ruleBuilder": "Rule Builder",
+    "description": "Create and manage alert rules",
+    "create": "Create Alert Rule",
+    "createRule": "Create Alert Rule",
+    "ruleName": "Rule Name",
+    "ruleNamePlaceholder": "e.g., Revenue Drop Alert",
+    "severity": "Severity",
+    "active": "Active",
+    "inactive": "Inactive",
+    "empty": "No alert rules created yet"
+  },
+  "financials": {
+    "revenue": "Revenue",
+    "netIncome": "Net Income",
+    "ebitda": "EBITDA",
+    "netMargin": "Net Margin",
+    "debtToEquity": "D/E Ratio",
+    "noData": "No financial data available"
+  },
+  "events": {
+    "noData": "No events available"
+  },
+  "severity": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "sentiment": {
+    "positive": "Positive",
+    "neutral": "Neutral",
+    "negative": "Negative"
   },
   "sectors": {
     "banking": "Banking",
@@ -120,10 +143,11 @@
     "healthcare": "Healthcare",
     "technology": "Technology",
     "energy": "Energy",
-    "telecommunications": "Telecommunications",
+    "telecom": "Telecommunications",
     "manufacturing": "Manufacturing",
     "transportation": "Transportation",
     "construction": "Construction",
+    "industrial": "Industrial",
     "other": "Other"
   },
   "countries": {

@@ -1,17 +1,12 @@
 {
   "common": {
     "loading": "جاري التحميل...",
-    "error": "خطأ",
-    "success": "نجح",
-    "cancel": "إلغاء",
+    "view": "عرض",
+    "create": "إنشاء",
     "save": "حفظ",
+    "cancel": "إلغاء",
     "delete": "حذف",
-    "edit": "تعديل",
-    "search": "بحث",
-    "filter": "تصفية",
-    "export": "تصدير",
-    "refresh": "تحديث",
-    "viewDetails": "عرض التفاصيل"
+    "edit": "تعديل"
   },
   "auth": {
     "signIn": "تسجيل الدخول",
@@ -47,30 +42,32 @@
     "recentEvents": "الأحداث الأخيرة",
     "topRiskCompanies": "أعلى الشركات خطورة"
   },
+  "companies": {
+    "title": "الشركات",
+    "searchDescription": "البحث وتصفية الشركات في السعودية والإمارات ومصر",
+    "searchPlaceholder": "البحث بالاسم أو الرمز أو رمز ISIN...",
+    "allSectors": "جميع القطاعات",
+    "allCountries": "جميع الدول",
+    "noResults": "لم يتم العثور على شركات",
+    "notFound": "الشركة غير موجودة"
+  },
   "company": {
     "overview": "نظرة عامة",
     "financials": "البيانات المالية",
     "events": "الأخبار والأحداث",
-    "filings": "الملفات",
-    "people": "الأشخاص",
-    "forecast": "التوقعات",
-    "comparables": "المقارنات",
+    "name": "اسم الشركة",
     "ticker": "الرمز",
-    "isin": "ISIN",
     "sector": "القطاع",
     "country": "الدولة",
-    "exchange": "البورصة",
-    "marketCap": "القيمة السوقية",
     "riskScore": "درجة المخاطر",
-    "revenue": "الإيرادات",
-    "ebitda": "الأرباح قبل الفوائد والضرائب",
-    "netIncome": "صافي الدخل",
-    "operatingMargin": "هامش التشغيل",
-    "netMargin": "هامش الربح الصافي",
-    "roe": "العائد على حقوق الملكية",
-    "debtToEquity": "الدين / حقوق الملكية"
+    "isin": "رمز ISIN",
+    "exchange": "السوق",
+    "marketCap": "القيمة السوقية",
+    "website": "الموقع الإلكتروني",
+    "description": "الوصف",
+    "noDescription": "لا يوجد وصف متاح"
   },
-  "events": {
+  "eventTypes": {
     "earnings_release": "إصدار الأرباح",
     "earnings_beat": "تجاوز الأرباح",
     "earnings_miss": "انخفاض الأرباح",
@@ -92,25 +89,51 @@
     "esg_event": "حدث بيئي واجتماعي",
     "other": "أخرى"
   },
-  "alerts": {
-    "title": "قواعد التنبيه",
-    "createRule": "إنشاء قاعدة تنبيه",
-    "ruleBuilder": "منشئ القواعد",
-    "testRule": "اختبار القاعدة",
-    "alertHistory": "سجل التنبيهات",
-    "severity": {
-      "low": "منخفضة",
-      "medium": "متوسطة",
-      "high": "عالية",
-      "critical": "حرجة"
-    }
-  },
   "watchlists": {
     "title": "قوائم المراقبة",
-    "createWatchlist": "إنشاء قائمة مراقبة",
-    "addCompanies": "إضافة شركات",
     "myWatchlists": "قوائمي",
-    "sharedWatchlists": "القوائم المشتركة"
+    "description": "تنظيم ومتابعة الشركات المهمة",
+    "create": "إنشاء قائمة مراقبة",
+    "createNew": "إنشاء قائمة مراقبة جديدة",
+    "name": "الاسم",
+    "namePlaceholder": "مثال: البنوك عالية المخاطر",
+    "descriptionPlaceholder": "وصف اختياري",
+    "empty": "لم يتم إنشاء قوائم مراقبة بعد"
+  },
+  "alerts": {
+    "title": "التنبيهات",
+    "ruleBuilder": "منشئ القواعد",
+    "description": "إنشاء وإدارة قواعد التنبيه",
+    "create": "إنشاء قاعدة تنبيه",
+    "createRule": "إنشاء قاعدة تنبيه",
+    "ruleName": "اسم القاعدة",
+    "ruleNamePlaceholder": "مثال: تنبيه انخفاض الإيرادات",
+    "severity": "الأهمية",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "empty": "لم يتم إنشاء قواعد تنبيه بعد"
+  },
+  "financials": {
+    "revenue": "الإيرادات",
+    "netIncome": "صافي الربح",
+    "ebitda": "الأرباح قبل الفوائد والضرائب",
+    "netMargin": "هامش الربح الصافي",
+    "debtToEquity": "نسبة الدين إلى حقوق الملكية",
+    "noData": "لا توجد بيانات مالية متاحة"
+  },
+  "events": {
+    "noData": "لا توجد أحداث متاحة"
+  },
+  "severity": {
+    "low": "منخفضة",
+    "medium": "متوسطة",
+    "high": "عالية",
+    "critical": "حرجة"
+  },
+  "sentiment": {
+    "positive": "إيجابي",
+    "neutral": "محايد",
+    "negative": "سلبي"
   },
   "sectors": {
     "banking": "المصرفية",
@@ -120,10 +143,11 @@
     "healthcare": "الرعاية الصحية",
     "technology": "التكنولوجيا",
     "energy": "الطاقة",
-    "telecommunications": "الاتصالات",
+    "telecom": "الاتصالات",
     "manufacturing": "التصنيع",
     "transportation": "النقل",
     "construction": "البناء",
+    "industrial": "الصناعية",
     "other": "أخرى"
   },
   "countries": {
