@@ -51,12 +51,11 @@ const Companies = () => {
                   <SelectValue placeholder={t('companies.allSectors')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t('companies.allSectors')}</SelectItem>
                   <SelectItem value="banking">{t('sectors.banking')}</SelectItem>
                   <SelectItem value="real_estate">{t('sectors.real_estate')}</SelectItem>
                   <SelectItem value="retail">{t('sectors.retail')}</SelectItem>
                   <SelectItem value="energy">{t('sectors.energy')}</SelectItem>
-                  <SelectItem value="telecom">{t('sectors.telecom')}</SelectItem>
+                  <SelectItem value="telecom">{t('sectors.telecommunications')}</SelectItem>
                   <SelectItem value="healthcare">{t('sectors.healthcare')}</SelectItem>
                   <SelectItem value="industrial">{t('sectors.industrial')}</SelectItem>
                   <SelectItem value="technology">{t('sectors.technology')}</SelectItem>
@@ -67,7 +66,6 @@ const Companies = () => {
                   <SelectValue placeholder={t('companies.allCountries')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t('companies.allCountries')}</SelectItem>
                   <SelectItem value="SA">{t('countries.SA')}</SelectItem>
                   <SelectItem value="AE">{t('countries.AE')}</SelectItem>
                   <SelectItem value="EG">{t('countries.EG')}</SelectItem>
