@@ -1,7 +1,6 @@
 {
   "common": {
     "loading": "Loading...",
-<<<<<<< HEAD
     "error": "Error",
     "success": "Success",
     "cancel": "Cancel",
@@ -13,14 +12,6 @@
     "export": "Export",
     "refresh": "Refresh",
     "viewDetails": "View Details"
-=======
-    "view": "View",
-    "create": "Create",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit"
->>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
   },
   "auth": {
     "signIn": "Sign In",
@@ -56,23 +47,10 @@
     "recentEvents": "Recent Events",
     "topRiskCompanies": "Top Risk Companies"
   },
-<<<<<<< HEAD
-=======
-  "companies": {
-    "title": "Companies",
-    "searchDescription": "Search and filter companies across KSA, UAE, and Egypt",
-    "searchPlaceholder": "Search by name, ticker, or ISIN...",
-    "allSectors": "All Sectors",
-    "allCountries": "All Countries",
-    "noResults": "No companies found",
-    "notFound": "Company not found"
-  },
->>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
   "company": {
     "overview": "Overview",
     "financials": "Financials",
     "events": "News & Events",
-<<<<<<< HEAD
     "filings": "Filings",
     "people": "People",
     "forecast": "Forecast",
@@ -93,21 +71,6 @@
     "debtToEquity": "Debt/Equity"
   },
   "events": {
-=======
-    "name": "Company Name",
-    "ticker": "Ticker",
-    "sector": "Sector",
-    "country": "Country",
-    "riskScore": "Risk Score",
-    "isin": "ISIN",
-    "exchange": "Exchange",
-    "marketCap": "Market Cap",
-    "website": "Website",
-    "description": "Description",
-    "noDescription": "No description available"
-  },
-  "eventTypes": {
->>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
     "earnings_release": "Earnings Release",
     "earnings_beat": "Earnings Beat",
     "earnings_miss": "Earnings Miss",
@@ -129,7 +92,6 @@
     "esg_event": "ESG Event",
     "other": "Other"
   },
-<<<<<<< HEAD
   "alerts": {
     "title": "Alert Rules",
     "createRule": "Create Alert Rule",
@@ -149,53 +111,6 @@
     "addCompanies": "Add Companies",
     "myWatchlists": "My Watchlists",
     "sharedWatchlists": "Shared Watchlists"
-=======
-  "watchlists": {
-    "title": "Watchlists",
-    "myWatchlists": "My Watchlists",
-    "description": "Organize and track companies of interest",
-    "create": "Create Watchlist",
-    "createNew": "Create New Watchlist",
-    "name": "Name",
-    "namePlaceholder": "e.g., High Risk Banks",
-    "descriptionPlaceholder": "Optional description",
-    "empty": "No watchlists created yet"
-  },
-  "alerts": {
-    "title": "Alerts",
-    "ruleBuilder": "Rule Builder",
-    "description": "Create and manage alert rules",
-    "create": "Create Alert Rule",
-    "createRule": "Create Alert Rule",
-    "ruleName": "Rule Name",
-    "ruleNamePlaceholder": "e.g., Revenue Drop Alert",
-    "severity": "Severity",
-    "active": "Active",
-    "inactive": "Inactive",
-    "empty": "No alert rules created yet"
-  },
-  "financials": {
-    "revenue": "Revenue",
-    "netIncome": "Net Income",
-    "ebitda": "EBITDA",
-    "netMargin": "Net Margin",
-    "debtToEquity": "D/E Ratio",
-    "noData": "No financial data available"
-  },
-  "events": {
-    "noData": "No events available"
-  },
-  "severity": {
-    "low": "Low",
-    "medium": "Medium",
-    "high": "High",
-    "critical": "Critical"
-  },
-  "sentiment": {
-    "positive": "Positive",
-    "neutral": "Neutral",
-    "negative": "Negative"
->>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
   },
   "sectors": {
     "banking": "Banking",
@@ -205,18 +120,10 @@
     "healthcare": "Healthcare",
     "technology": "Technology",
     "energy": "Energy",
-<<<<<<< HEAD
     "telecommunications": "Telecommunications",
     "manufacturing": "Manufacturing",
     "transportation": "Transportation",
     "construction": "Construction",
-=======
-    "telecom": "Telecommunications",
-    "manufacturing": "Manufacturing",
-    "transportation": "Transportation",
-    "construction": "Construction",
-    "industrial": "Industrial",
->>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
     "other": "Other"
   },
   "countries": {

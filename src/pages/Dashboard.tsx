@@ -1,12 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-<<<<<<< HEAD
 import KpiGrid from "@/components/dashboard/KpiGrid";
 import EventsFeed from "@/components/dashboard/EventsFeed";
 import HeatmapPlaceholder from "@/components/dashboard/HeatmapPlaceholder";
-=======
->>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
 import { 
   BuildingOfficeIcon, 
   DocumentTextIcon, 
@@ -84,7 +81,6 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
-<<<<<<< HEAD
 
       {/* Added: Dashboard blocks (KPI grid, Events feed, Heatmap) */}
       <div className="space-y-4">
@@ -99,8 +95,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-=======
->>>>>>> 467fd0a475c25716ce964992426fa3e65259afc7
     </AppLayout>
   );
 };
