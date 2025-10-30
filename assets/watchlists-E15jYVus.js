@@ -1,1 +1,0 @@
-import{g as i,p as a}from"./http-DM1drYR6.js";import"./index-BfBpM7jo.js";async function c(){return i("/watchlists")}async function e(t,s){if(!t)throw{status:400,message:"Missing watchlist id"};await a(`/watchlists/${encodeURIComponent(t)}/companies`,{companyIds:s})}export{e as addCompaniesToWatchlist,c as listWatchlists};

@@ -1,1 +1,0 @@
-import{p as s,g as e}from"./http-DM1drYR6.js";import"./index-BfBpM7jo.js";const a=t=>s("/alerts/rules",t),l=t=>s("/alerts/test",t),c=t=>e("/alerts/history?"+new URLSearchParams(Object(t)));export{a as createRule,c as listHistory,l as testRule};
