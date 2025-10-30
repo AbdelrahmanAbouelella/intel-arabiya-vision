@@ -1,8 +1,13 @@
 import type { KPI, EventItem } from '@/types/dashboard';
+import { USE_MOCKS } from "@/lib/runtime";
 
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 export async function getDashboardKpis(): Promise<KPI[]> {
+  if (!USE_MOCKS) {
+    const { getKpis } = await import("@/api/dashboard");
+    return getKpis();
+  }
   await wait(400);
   return [
     { key: 'companies',   label: 'Covered Companies', value: 40 },
@@ -17,6 +22,11 @@ let cursorSeed = 0;
 export type EventsPage = { items: EventItem[]; nextCursor?: string };
 
 export async function getEventsPage(cursor?: string): Promise<EventsPage> {
+  if (!USE_MOCKS) {
+    const { listLatestEvents } = await import("@/api/dashboard");
+    const page = await listLatestEvents({ cursor });
+    return { items: page.items, nextCursor: page.cursor_next };
+  }
   await wait(500);
   const page = cursor ? parseInt(cursor, 10) : 0;
   const items: EventItem[] = Array.from({ length: 10 }).map((_, i) => {
@@ -35,6 +45,6 @@ export async function getEventsPage(cursor?: string): Promise<EventsPage> {
       source: ['Tadawul','DFM','EGX','News'][Math.floor(Math.random()*4)],
     };
   });
-  return { items, nextCursor: page < 4 ? String(page + 1) : undefined }; // 5 صفحات
+  return { items, nextCursor: page < 4 ? String(page + 1) : undefined };
 }
 

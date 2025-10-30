@@ -1,6 +1,7 @@
 import type { AlertHistoryItem, AlertRule, AlertTestResult } from "@/types/alerts";
 import type { CompaniesQuery, CompanyRow } from "@/types/companies";
 import { getCompanies } from "./mockCompanies";
+import { USE_MOCKS } from "@/lib/runtime";
 
 const wait = (ms:number)=>new Promise(r=>setTimeout(r,ms));
 
@@ -24,6 +25,10 @@ export async function listRules(): Promise<AlertRule[]> {
 }
 
 export async function createRule(input: Omit<AlertRule, "id"|"created_at">): Promise<{id:string}> {
+  if (!USE_MOCKS) {
+    const { createRule } = await import("@/api/alerts");
+    return createRule(input as any);
+  }
   await wait(120);
   const id = `r-${rules.length+1}`;
   rules.push({ ...input, id, created_at: new Date().toISOString() });
@@ -52,7 +57,10 @@ function applyRuleToRows(r: AlertRule, rows: CompanyRow[]): CompanyRow[] {
 }
 
 export async function testRule(r: AlertRule): Promise<AlertTestResult> {
-  // هات صفحتين من الشركات وطبّق الشرط
+  if (!USE_MOCKS) {
+    const { testRule } = await import("@/api/alerts");
+    return testRule(r as any);
+  }
   const page1 = await getCompanies({} as CompaniesQuery, undefined);
   const page2 = await getCompanies({} as CompaniesQuery, page1.cursor_next);
   const all = [...page1.items, ...page2.items];
@@ -73,12 +81,17 @@ export async function testRule(r: AlertRule): Promise<AlertTestResult> {
   return { matches };
 }
 
-export async function listHistory(): Promise<AlertHistoryItem[]> {
+export async function listHistory(): Promise<any[]> {
+  if (!USE_MOCKS) {
+    const { listHistory } = await import("@/api/alerts");
+    const res = await listHistory({});
+    return res.items as any[];
+  }
   await wait(80);
   return JSON.parse(JSON.stringify(history.slice(-100))).reverse();
 }
 
-// تشغيل “موك” للإنذار: أضف نتائج الـtest إلى history
+// keep convenience mock action for demo mode
 export async function runNow(id: string): Promise<number> {
   const r = rules.find(x=>x.id===id);
   if (!r) return 0;
@@ -91,4 +104,3 @@ export async function runNow(id: string): Promise<number> {
   history.push(...items);
   return items.length;
 }
-

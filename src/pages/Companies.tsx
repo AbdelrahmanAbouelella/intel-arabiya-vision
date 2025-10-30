@@ -1,151 +1,131 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import type { CompaniesQuery, CompanyRow } from '@/types/companies';
-import { getCompanies } from '@/services/mockCompanies';
-import { addCompaniesToWatchlist, listWatchlists } from '@/services/mockWatchlists';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { listCompanies as listCompaniesData } from '@/services/data/companies';
+import FiltersBar from '@/components/companies/FiltersBar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/components/ui/use-toast';
+import { useSelection } from '@/contexts/SelectionContext';
 
-type SavedView = { id:string; name:string }; // placeholder, not used in fallback
+type ListParams = CompaniesQuery & { limit?: number; cursor?: string };
 
 export default function CompaniesPageSafe() {
-  const [filters, setFilters] = useState<CompaniesQuery>({
-    query: '',
-    sector: '',
-    country: '',
-    exchange: '',
-    risk_min: 0,
-    risk_max: 100,
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [filters, setFilters] = useState<CompaniesQuery>({});
+  const [defaultWl, setDefaultWl] = useState<string | undefined>(undefined);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
+  const [debouncedQuery, setDebouncedQuery] = useState<string | undefined>(undefined);
+  const { setSelectedIds } = useSelection();
+
+  useEffect(() => {
+    (async ()=>{
+      const wl = await import('@/services/mockWatchlists');
+      const x = await wl.listWatchlists();
+      setDefaultWl(x[0]?.id);
+    })();
+  }, []);
+
+  useEffect(() => {
+    const getNum = (k: string): number | undefined => {
+      const v = searchParams.get(k);
+      return v === null || v === '' ? undefined : Number(v);
+    };
+    const initial: CompaniesQuery = {
+      query: searchParams.get('query') || undefined,
+      sector: searchParams.get('sector') || undefined,
+      country: searchParams.get('country') || undefined,
+      exchange: searchParams.get('exchange') || undefined,
+      mcap_min: getNum('mcap_min'),
+      mcap_max: getNum('mcap_max'),
+      risk_min: getNum('risk_min'),
+      risk_max: getNum('risk_max'),
+    };
+    setFilters(initial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // debounce query into URL
+  useEffect(() => {
+    const h = setTimeout(() => setDebouncedQuery(filters.query || undefined), 300);
+    return () => clearTimeout(h);
+  }, [filters.query]);
+
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    const push = (k: keyof CompaniesQuery) => {
+      const v = filters[k];
+      if (v !== undefined && v !== '' && v !== null) params[k as string] = String(v);
+    };
+    if (debouncedQuery && debouncedQuery !== '') params['query'] = debouncedQuery;
+    push('sector'); push('country'); push('exchange');
+    push('mcap_min'); push('mcap_max'); push('risk_min'); push('risk_max');
+    setSearchParams(params, { replace: true });
+  }, [filters.sector, filters.country, filters.exchange, filters.mcap_min, filters.mcap_max, filters.risk_min, filters.risk_max, debouncedQuery, setSearchParams]);
+
+  const api = useMemo(() => ({
+    listCompanies: async (params: ListParams) => {
+      const limit = params.limit ?? 25;
+      const offset = (params as any).offset ?? (params.cursor ? Number(params.cursor) || 0 : 0);
+      const { items, total } = await listCompaniesData({
+        query: params.query,
+        sector: params.sector,
+        country: params.country,
+        limit,
+        offset,
+      });
+      // emulate cursor paging contract
+      const hasMore = offset + items.length < total;
+      return { items, cursor_next: hasMore ? String(offset + limit) : undefined } as any;
+    },
+  }), []);
+
+  const {
+    data: pages,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+  } = useInfiniteQuery({
+    queryKey: ['companies', filters],
+    queryFn: ({ pageParam }) => api.listCompanies({ ...filters, cursor: pageParam, limit: 25 }),
+    initialPageParam: 0 as number,
+    getNextPageParam: (last) => (last as any)?.cursor_next,
+    enabled: true,
   });
 
-  const [data, setData] = useState<CompanyRow[]>([]);
-  const [cursor, setCursor] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
-  const [defaultWl, setDefaultWl] = useState<string | undefined>(undefined);
-
-  async function runSearch(reset = true) {
-    setLoading(true);
-    try {
-      const page = await getCompanies(filters, reset ? undefined : cursor);
-      setData(prev => reset ? page.items : [...prev, ...page.items]);
-      setCursor(page.cursor_next);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { runSearch(true); }, []);
-  useEffect(() => { listWatchlists().then(x => setDefaultWl(x[0]?.id)); }, []);
+  const rows: CompanyRow[] = useMemo(() => ((pages as any)?.pages ?? []).flatMap((p: any) => p.items), [pages]);
 
   return (
     <AppLayout>
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Companies</h1>
 
-        {/* Fallback Filters (pure HTML) */}
-        <div className="rounded-xl border bg-card p-3">
-          <div className="grid gap-3 md:grid-cols-5">
-            <div className="md:col-span-2">
-              <label className="block text-sm mb-1">Search</label>
-              <input
-                className="w-full h-10 rounded-md border px-3 text-sm"
-                placeholder="Name / Ticker / ISIN"
-                value={filters.query || ''}
-                onChange={e => setFilters({ ...filters, query: e.target.value })}
-              />
-            </div>
+        <FiltersBar
+          value={filters}
+          onChange={(f)=>{ setFilters(f); const empty = new Set<string>(); setSelected(empty); setSelectedIds([]); }}
+          onReset={() => { setFilters({}); setSearchParams({}); const empty = new Set<string>(); setSelected(empty); setSelectedIds([]); }}
+          onSearch={() => { /* auto-refetch via queryKey */ }}
+        />
 
-            <div>
-              <label className="block text-sm mb-1">Sector</label>
-              <select
-                className="w-full h-10 rounded-md border px-3 text-sm"
-                value={filters.sector || ''}
-                onChange={e => setFilters({ ...filters, sector: e.target.value || undefined })}
-              >
-                <option value="">All</option>
-                <option>Banks</option>
-                <option>Energy</option>
-                <option>Telecom</option>
-                <option>Materials</option>
-                <option>Consumer</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm mb-1">Country</label>
-              <select
-                className="w-full h-10 rounded-md border px-3 text-sm"
-                value={filters.country || ''}
-                onChange={e => setFilters({ ...filters, country: e.target.value || undefined })}
-              >
-                <option value="">All</option>
-                <option>KSA</option>
-                <option>UAE</option>
-                <option>Egypt</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm mb-1">Exchange</label>
-              <select
-                className="w-full h-10 rounded-md border px-3 text-sm"
-                value={filters.exchange || ''}
-                onChange={e => setFilters({ ...filters, exchange: e.target.value || undefined })}
-              >
-                <option value="">All</option>
-                <option>Tadawul</option>
-                <option>DFM</option>
-                <option>EGX</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="mt-3 grid gap-3 md:grid-cols-5 items-end">
-            <div className="md:col-span-3">
-              <label className="block text-sm mb-1">Risk band (0–100)</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  className="w-24 h-10 rounded-md border px-2 text-sm"
-                  value={filters.risk_min ?? 0}
-                  onChange={e => setFilters({ ...filters, risk_min: Number(e.target.value) })}
-                />
-                <span>to</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  className="w-24 h-10 rounded-md border px-2 text-sm"
-                  value={filters.risk_max ?? 100}
-                  onChange={e => setFilters({ ...filters, risk_max: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-
-            <div className="md:col-span-2 flex justify-end gap-2">
-              <button
-                className="h-10 rounded-md border px-3 text-sm"
-                onClick={() => setFilters({ query:'', sector:'', country:'', exchange:'', risk_min:0, risk_max:100 })}
-              >
-                Reset
-              </button>
-              <button
-                className="h-10 rounded-md bg-primary px-3 text-sm text-primary-foreground"
-                onClick={() => runSearch(true)}
-                disabled={loading}
-              >
-                {loading ? 'Loading…' : 'Search'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Simple Results Table (no TanStack) */}
         <div className="rounded-xl border overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40">
+          <table className="min-w-full text-sm">
+            <thead className="bg-muted/40 sticky top-0 z-10">
               <tr>
+                <th className="p-2 text-left w-10">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all"
+                    checked={rows.length>0 && selected.size===rows.length}
+                    onChange={(e)=>{
+                      if (e.target.checked) setSelected(new Set(rows.map(r=>r.id)));
+                      else setSelected(new Set());
+                      const ids = e.target.checked ? rows.map(r=>r.id) : [];
+                      setSelectedIds(ids);
+                    }}
+                  />
+                </th>
                 <th className="p-2 text-left">Company</th>
                 <th className="p-2 text-left">Sector</th>
                 <th className="p-2 text-left">Country</th>
@@ -157,13 +137,33 @@ export default function CompaniesPageSafe() {
               </tr>
             </thead>
             <tbody>
-              {data.map(row => {
-                const risk = row.risk_score ?? 0;
+              {!pages && isFetching && (
+                <tr><td className="p-2" colSpan={9}>
+                  <div className="space-y-2 p-2">
+                    {Array.from({length:6}).map((_,i)=> <Skeleton key={i} className="h-8 w-full" />)}
+                  </div>
+                </td></tr>
+              )}
+              {rows.map(row => {
+                const risk = (row as any).risk_score ?? 0;
                 const color = risk>70?'text-red-600':risk>40?'text-amber-600':'text-green-600';
+                const isSel = selected.has(row.id);
                 return (
-                  <tr key={row.id} className="hover:bg-muted/30 border-t">
+                  <tr key={row.id} className={`hover:bg-muted/30 border-t ${isSel ? 'bg-muted/20' : ''}`}>
                     <td className="p-2">
-                      <Link to={`/company?id=${row.id}`} className="underline">
+                      <input
+                        type="checkbox"
+                        checked={isSel}
+                        onChange={(e)=>{
+                          const next = new Set(selected);
+                          if (e.target.checked) next.add(row.id); else next.delete(row.id);
+                          setSelected(next);
+                          setSelectedIds(Array.from(next));
+                        }}
+                      />
+                    </td>
+                    <td className="p-2">
+                      <Link to={`/company/${row.id}`} className="underline">
                         {row.name_en}
                       </Link>
                     </td>
@@ -174,12 +174,12 @@ export default function CompaniesPageSafe() {
                     <td className="p-2">{row.net_income_last ? row.net_income_last.toLocaleString() : '—'}</td>
                     <td className={`p-2 font-medium ${color}`}>{risk}</td>
                     <td className="p-2 text-muted-foreground">
-                      {row.last_event_summary?.text ?? '—'}
+                      {(row as any).last_event_summary?.text ?? '—'}
                     </td>
                   </tr>
                 );
               })}
-              {data.length === 0 && (
+              {rows.length === 0 && !isFetching && (
                 <tr><td className="p-4 text-muted-foreground">No results</td></tr>
               )}
             </tbody>
@@ -189,24 +189,30 @@ export default function CompaniesPageSafe() {
         <div className="flex justify-end">
           <button
             className="h-10 rounded-md border px-3 text-sm"
-            disabled={!defaultWl || data.length === 0}
+            disabled={!defaultWl || selected.size === 0}
             onClick={async ()=>{
-              const ids = data.slice(0,5).map(r=>r.id); // Demo: أول 5
-              await addCompaniesToWatchlist(defaultWl!, ids);
-              alert(`Added ${ids.length} to watchlist ( ${defaultWl} )`);
+              if (!defaultWl) { toast({ description: 'No watchlist found. Create one first.' }); return; }
+              const ids = Array.from(selected);
+              try {
+                const { addCompaniesToWatchlist } = await import('@/services/mockWatchlists');
+                await addCompaniesToWatchlist(defaultWl!, ids);
+                toast({ description: `Added ${ids.length} companies to watchlist.` });
+              } catch (e:any) {
+                toast({ description: e?.message || 'Failed to add to watchlist' });
+              }
             }}
           >
-            Add 5 to Watchlist (demo)
+            Add to Watchlist
           </button>
         </div>
 
         <div className="flex justify-center py-3">
           <button
             className="h-10 rounded-md border px-3 text-sm"
-            onClick={() => runSearch(false)}
-            disabled={!cursor || loading}
+            onClick={() => fetchNextPage()}
+            disabled={!hasNextPage || isFetching}
           >
-            {cursor ? (loading ? 'Loading…' : 'Load more') : 'No more'}
+            {hasNextPage ? (isFetching ? 'Loading…' : 'Load more') : 'No more'}
           </button>
         </div>
       </div>

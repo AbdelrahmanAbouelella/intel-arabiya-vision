@@ -1,6 +1,7 @@
 import type { Watchlist, WatchlistRollups } from '@/types/watchlists';
 import type { CompanyRow } from '@/types/companies';
 import { getCompanies } from './mockCompanies';
+import { USE_MOCKS } from "@/lib/runtime";
 
 let lists: Watchlist[] = [
   { id: 'wl-1', name: 'My Watchlist', companyIds: [] }
@@ -9,6 +10,10 @@ let lists: Watchlist[] = [
 const wait = (ms:number)=>new Promise(r=>setTimeout(r,ms));
 
 export async function listWatchlists(): Promise<Watchlist[]> {
+  if (!USE_MOCKS) {
+    const { listWatchlists } = await import("@/api/watchlists");
+    return listWatchlists();
+  }
   await wait(150);
   return JSON.parse(JSON.stringify(lists));
 }
@@ -21,6 +26,10 @@ export async function createWatchlist(name: string): Promise<{id:string}> {
 }
 
 export async function addCompaniesToWatchlist(watchlistId: string, companyIds: string[]): Promise<void> {
+  if (!USE_MOCKS) {
+    const { addCompaniesToWatchlist } = await import("@/api/watchlists");
+    return addCompaniesToWatchlist(watchlistId, companyIds);
+  }
   await wait(150);
   const wl = lists.find(x => x.id === watchlistId);
   if (!wl) return;
@@ -58,4 +67,3 @@ export async function getWatchlistRollups(watchlistId: string): Promise<Watchlis
     topRevenue: byRevenue.slice(0,5).map(r => ({ id:r.id, name:r.name_en, revenue:r.revenue_last??0 })),
   };
 }
-

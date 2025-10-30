@@ -1,8 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { USE_MOCKS } from '@/lib/runtime';
 import { Button } from '@/components/ui/button';
 import {
   GlobeAltIcon,
@@ -22,7 +23,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { signOut } = useAuth();
-  const { language, toggleLanguage } = useLanguage();
+  const { language, toggleLanguage, numerals, toggleNumerals } = useLanguage();
 
   const menuItems = [
     { label: t('nav.dashboard'), path: '/dashboard', icon: HomeIcon },
@@ -45,12 +46,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               Corporate Intelligence
             </h1>
+            {USE_MOCKS && (
+              <span className="ml-2 rounded-md bg-amber-100 text-amber-800 px-2 py-0.5 text-xs border border-amber-300">Mock Mode</span>
+            )}
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={toggleLanguage}>
               <GlobeAltIcon className="h-5 w-5 mr-2" />
-              {language === 'en' ? 'العربية' : 'English'}
+              {language === 'en' ? 'AR' : 'EN'}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={toggleNumerals}>
+              {numerals === 'western' ? '١٢٣' : '123'}
             </Button>
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
@@ -82,3 +89,4 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 };
 
 export default AppLayout;
+

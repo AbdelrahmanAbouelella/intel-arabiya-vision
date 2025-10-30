@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
 import KpiCard from "./KpiCard";
-import { getDashboardKpis } from "@/services/mockApi";
 import type { KPI } from "@/types/dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { USE_MOCKS } from "@/lib/runtime";
 
 export default function KpiGrid() {
   const [data, setData] = useState<KPI[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getDashboardKpis().then(setData).finally(() => setLoading(false));
+    (async () => {
+      try {
+        if (USE_MOCKS) {
+          const { getDashboardKpis } = await import("@/services/mockApi");
+          setData(await getDashboardKpis());
+        } else {
+          const { getKpis } = await import("@/api/dashboard");
+          setData(await getKpis());
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   if (loading) {
@@ -28,4 +40,3 @@ export default function KpiGrid() {
     </div>
   );
 }
-

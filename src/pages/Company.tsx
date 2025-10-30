@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import { getCompanyById, type CompanyProfile } from "@/services/mockCompanyDetails";
+import type { CompanyProfile } from "@/types/api";
+import { USE_MOCKS } from "@/lib/runtime";
 
 function useQueryId() {
   const [id, setId] = useState<string | undefined>(undefined);
@@ -23,7 +24,13 @@ export default function CompanyPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    getCompanyById(id).then(setData).finally(()=>setLoading(false));
+    (async ()=>{
+      try {
+        const mod = USE_MOCKS ? await import("@/services/mockCompanyDetails") : await import("@/api/companies");
+        const res = USE_MOCKS ? await (mod as any).getCompanyById(id) : await (mod as any).getCompany(id);
+        setData(res as CompanyProfile);
+      } finally { setLoading(false); }
+    })();
   }, [id]);
 
   const title = useMemo(()=> data?.profile?.name_en ?? "Company", [data]);
@@ -269,4 +276,3 @@ function Comparables({data}:{data:CompanyProfile}) {
     </div>
   );
 }
-

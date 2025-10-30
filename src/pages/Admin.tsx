@@ -1,75 +1,68 @@
 import { useEffect, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import type { RiskWeights, ApiKey } from "@/types/admin";
-import { getRiskWeights, updateRiskWeights, previewRiskScore, listApiKeys, createApiKey, toggleApiKey, deleteApiKey, listAudit } from "@/services/mockAdmin";
+import type { ApiKey } from "@/types/admin";
+import { USE_MOCKS } from "@/lib/runtime";
 
-type Tab = "risk" | "keys" | "audit";
+const adminApi = {
+  listApiKeys: async () => (await import("@/services/mockAdmin")).listApiKeys(),
+  createApiKey: async (label: string, scopes: string[]) => (await import("@/services/mockAdmin")).createApiKey(label, scopes),
+  toggleApiKey: async (id: string, active: boolean) => (await import("@/services/mockAdmin")).toggleApiKey(id, active),
+  deleteApiKey: async (id: string) => (await import("@/services/mockAdmin")).deleteApiKey(id),
+  listAudit: async () => (await import("@/services/mockAdmin")).listAudit(),
+};
+
+type Tab = "users" | "keys" | "audit" | "retention";
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<Tab>("risk");
+  const [tab, setTab] = useState<Tab>("users");
   return (
     <AppLayout>
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Admin</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold">Admin</h1>
+          {USE_MOCKS && <span className="rounded-md bg-amber-100 text-amber-800 px-2 py-0.5 text-xs border border-amber-300">Mock Mode</span>}
+        </div>
         <div className="flex gap-2">
-          {(["risk","keys","audit"] as Tab[]).map(t=>(
+          {(["users","keys","audit","retention"] as Tab[]).map(t=>(
             <button key={t} className={`h-9 rounded-md border px-3 text-sm ${tab===t?'bg-primary text-primary-foreground':''}`} onClick={()=>setTab(t)}>
-              {t==="risk"?"Risk Weights":t==="keys"?"API Keys":"Audit Log"}
+              {t==="users"?"Users & Roles":t==="keys"?"API Keys":t==="audit"?"Audit Log":"Data Retention"}
             </button>
           ))}
         </div>
-        {tab==="risk" && <RiskWeightsTab />}
+        {tab==="users" && <UsersRolesTab />}
         {tab==="keys" && <ApiKeysTab />}
         {tab==="audit" && <AuditTab />}
+        {tab==="retention" && <DataRetentionTab />}
       </div>
     </AppLayout>
   );
 }
 
-/* -------- Risk Weights -------- */
-function RiskWeightsTab() {
-  const [w,setW] = useState<RiskWeights|null>(null);
-  const [preview,setPreview] = useState<{score:number; breakdown:Record<string,number>}|null>(null);
-  const [saving,setSaving] = useState(false);
-
-  useEffect(()=>{ getRiskWeights().then(setW); },[]);
-
-  async function doPreview(nw: RiskWeights){
-    const p = await previewRiskScore(nw);
-    setPreview(p);
-  }
-
-  if(!w) return <div className="text-sm text-muted-foreground">Loading…</div>;
-  const fields:(keyof RiskWeights)[] = ["volatility","leverage","neg_event_rate","sentiment_trend","exec_churn","filing_delays"];
-
+/* -------- Users & Roles (UI only) -------- */
+function UsersRolesTab() {
+  const roles = [
+    { key: 'Org Admin', desc: 'Full admin access across organization.' },
+    { key: 'Analyst', desc: 'Create alerts, manage watchlists, access data.' },
+    { key: 'Viewer', desc: 'Read-only access.' },
+  ];
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
-        {fields.map(f=>(
-          <div key={f} className="rounded-xl border p-3">
-            <div className="text-sm font-medium mb-2">{f.replaceAll("_"," ")}</div>
-            <input type="range" min={0} max={100} value={w[f]} onChange={e=>{
-              const nw = {...w, [f]: Number(e.target.value)} as RiskWeights;
-              setW(nw); doPreview(nw);
-            }} className="w-full"/>
-            <div className="text-sm mt-2">Weight: <b>{w[f]}</b></div>
+        {roles.map(r => (
+          <div key={r.key} className="rounded-xl border p-3">
+            <div className="font-semibold">{r.key}</div>
+            <div className="text-sm text-muted-foreground">{r.desc}</div>
+            <div className="mt-2 flex gap-2">
+              <button className="h-8 rounded-md border px-2 text-xs">Assign</button>
+              <button className="h-8 rounded-md border px-2 text-xs">Manage</button>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl border p-3 flex items-center justify-between">
-        <div>
-          <div className="font-semibold">Preview (mock)</div>
-          <div className="text-sm text-muted-foreground">Composite risk score based on current weights.</div>
-        </div>
-        <div className="text-3xl font-bold">{preview?.score ?? "-"}</div>
-      </div>
-
-      <div className="flex gap-2">
-        <button className="h-10 rounded-md bg-primary px-3 text-sm text-primary-foreground" disabled={saving} onClick={async()=>{ setSaving(true); await updateRiskWeights(w); setSaving(false); alert("Saved"); }}>
-          {saving? "Saving…" : "Save"}
-        </button>
-        <button className="h-10 rounded-md border px-3 text-sm" onClick={()=>getRiskWeights().then(x=>{ setW(x); setPreview(null); })}>Reset</button>
+      <div className="rounded-xl border p-3">
+        <div className="font-semibold mb-2">Users</div>
+        <div className="text-sm text-muted-foreground">User management UI placeholder (invite, suspend, reset MFA).</div>
       </div>
     </div>
   );
@@ -81,7 +74,7 @@ function ApiKeysTab() {
   const [label,setLabel]=useState("");
   const [scopes,setScopes]=useState("read:*");
 
-  async function refresh(){ setKeys(await listApiKeys()); }
+  async function refresh(){ setKeys(await adminApi.listApiKeys()); }
   useEffect(()=>{ refresh(); },[]);
 
   return (
@@ -97,12 +90,12 @@ function ApiKeysTab() {
             <div className="text-sm mb-1">Scopes (comma)</div>
             <input className="h-10 rounded-md border px-3 text-sm" value={scopes} onChange={e=>setScopes(e.target.value)}/>
           </div>
-          <button className="h-10 rounded-md bg-primary px-3 text-sm text-primary-foreground" onClick={async()=>{
-            if(!label.trim()) return;
-            const res = await createApiKey(label.trim(), scopes.split(",").map(s=>s.trim()).filter(Boolean));
-            alert(`Created. Token preview: ${res.token_preview}`);
-            setLabel(""); await refresh();
-          }}>Create</button>
+            <button className="h-10 rounded-md bg-primary px-3 text-sm text-primary-foreground" onClick={async()=>{
+              if(!label.trim()) return;
+              const res = await adminApi.createApiKey(label.trim(), scopes.split(",").map(s=>s.trim()).filter(Boolean));
+              alert(`Created. Token preview: ${res.token_preview}`);
+              setLabel(""); await refresh();
+            }}>Create</button>
         </div>
       </div>
 
@@ -127,10 +120,10 @@ function ApiKeysTab() {
                 <td className="p-2">{k.active?"Yes":"No"}</td>
                 <td className="p-2">{new Date(k.created_at).toLocaleString()}</td>
                 <td className="p-2 flex gap-2">
-                  <button className="h-8 rounded-md border px-2 text-xs" onClick={async()=>{ await toggleApiKey(k.id, !k.active); await refresh(); }}>
+                  <button className="h-8 rounded-md border px-2 text-xs" onClick={async()=>{ await adminApi.toggleApiKey(k.id, !k.active); await refresh(); }}>
                     {k.active?"Disable":"Enable"}
                   </button>
-                  <button className="h-8 rounded-md border px-2 text-xs" onClick={async()=>{ if(confirm("Delete key?")) { await deleteApiKey(k.id); await refresh(); }}}>
+                  <button className="h-8 rounded-md border px-2 text-xs" onClick={async()=>{ if(confirm("Delete key?")) { await adminApi.deleteApiKey(k.id); await refresh(); }}}>
                     Delete
                   </button>
                 </td>
@@ -146,8 +139,8 @@ function ApiKeysTab() {
 
 /* -------- Audit Log -------- */
 function AuditTab() {
-  const [rows,setRows]=useState<Awaited<ReturnType<typeof listAudit>>>([]);
-  async function refresh(){ setRows(await listAudit()); }
+  const [rows,setRows]=useState<any[]>([]);
+  async function refresh(){ setRows(await adminApi.listAudit()); }
   useEffect(()=>{ refresh(); },[]);
   return (
     <div className="rounded-xl border p-3">
@@ -159,7 +152,7 @@ function AuditTab() {
         {rows.map(r=>(
           <div key={r.id} className="rounded-md border p-2">
             <div className="text-sm">
-              {new Date(r.at).toLocaleString()} — <b>{r.action}</b> {r.entity?`on ${r.entity}`:""} {r.entity_id?`#${r.entity_id}`:""}
+              {new Date(r.at).toLocaleString()} • <b>{r.action}</b> {r.entity?`on ${r.entity}`:""} {r.entity_id?`#${r.entity_id}`:""}
             </div>
             {r.before && <div className="text-xs text-muted-foreground">before: {JSON.stringify(r.before)}</div>}
             {r.after && <div className="text-xs text-muted-foreground">after: {JSON.stringify(r.after)}</div>}
@@ -170,3 +163,31 @@ function AuditTab() {
     </div>
   );
 }
+
+/* -------- Data Retention (UI only) -------- */
+function DataRetentionTab() {
+  const [eventsDays, setEventsDays] = useState(180);
+  const [auditDays, setAuditDays] = useState(365);
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border p-3 space-y-3">
+        <div className="font-semibold">Retention Policies</div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div>
+            <div className="text-sm mb-1">Events retention (days)</div>
+            <input type="number" className="h-9 rounded-md border px-2 text-sm" value={eventsDays} onChange={e=>setEventsDays(Number(e.target.value))} />
+          </div>
+          <div>
+            <div className="text-sm mb-1">Audit log retention (days)</div>
+            <input type="number" className="h-9 rounded-md border px-2 text-sm" value={auditDays} onChange={e=>setAuditDays(Number(e.target.value))} />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button className="h-9 rounded-md bg-primary px-3 text-sm text-primary-foreground">Save</button>
+          <button className="h-9 rounded-md border px-3 text-sm">Export Audit Log</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+

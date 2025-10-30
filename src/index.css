@@ -164,6 +164,17 @@ All colors MUST be HSL.
     direction: rtl;
   }
 
+  /* Logical spacing for tables */
+  table th, table td {
+    padding-inline: 0.5rem;
+  }
+  [dir="ltr"] table th,[dir="ltr"] table td { text-align: left; }
+  [dir="rtl"] table th,[dir="rtl"] table td { text-align: right; }
+
+  /* Logical text alignment helpers */
+  .text-start { text-align: start; }
+  .text-end { text-align: end; }
+
   [dir="rtl"] .sidebar {
     border-right: none;
     border-left: 1px solid hsl(var(--border));

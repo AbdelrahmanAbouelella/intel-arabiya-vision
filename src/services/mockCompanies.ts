@@ -1,4 +1,5 @@
 import type { CompaniesQuery, CompaniesPage, CompanyRow } from '@/types/companies';
+import { USE_MOCKS } from "@/lib/runtime";
 
 const sectors = ['Banks','Energy','Telecom','Materials','Consumer'];
 const countries = ['KSA','UAE','Egypt'];
@@ -32,6 +33,10 @@ const companies: CompanyRow[] = Array.from({length: 120}).map((_, i) => {
 const wait = (ms:number)=>new Promise(r=>setTimeout(r,ms));
 
 export async function getCompanies(query: CompaniesQuery, cursor?: string): Promise<CompaniesPage> {
+  if (!USE_MOCKS) {
+    const { listCompanies } = await import("@/api/companies");
+    return listCompanies({ ...(query as any), cursor });
+  }
   await wait(400);
   // filter in-memory
   let data = companies.filter(c => {
@@ -71,3 +76,7 @@ export function saveSavedView(name: string, filters: CompaniesQuery) {
   return Promise.resolve({ id });
 }
 
+// Optional compatibility: expose API-like signature for easy switching
+export async function listCompanies(params: CompaniesQuery & { limit?: number; cursor?: string }): Promise<CompaniesPage> {
+  return getCompanies(params, params?.cursor);
+}

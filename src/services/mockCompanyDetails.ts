@@ -1,4 +1,6 @@
 import type { CompanyRow } from "@/types/companies";
+import type { FinancialPoint } from "@/types/api";
+import { USE_MOCKS } from "@/lib/runtime";
 
 const wait = (ms:number)=>new Promise(r=>setTimeout(r,ms));
 
@@ -16,6 +18,10 @@ export type CompanyProfile = {
 };
 
 export async function getCompanyById(id: string): Promise<CompanyProfile> {
+  if (!USE_MOCKS) {
+    const { getCompany } = await import("@/api/companies");
+    return getCompany(id) as unknown as CompanyProfile;
+  }
   await wait(300);
 
   const mk = (n:number)=>Math.floor(Math.random()*n);
@@ -77,3 +83,41 @@ export async function getCompanyById(id: string): Promise<CompanyProfile> {
   };
 }
 
+export async function getCompanyFinancials(id: string, freq: 'quarterly'|'annual', periods: number) {
+  if (!USE_MOCKS) {
+    const { getCompanyFinancials } = await import("@/api/companies");
+    return getCompanyFinancials(id, freq, periods);
+  }
+  const profile = await getCompanyById(id);
+  const series: FinancialPoint[] = profile.financials.map(f => ({
+    period: f.period,
+    revenue: f.revenue,
+    ebitda: f.ebitda,
+    net_income: f.net_income,
+    margin: f.margin,
+  }));
+  return series.slice(-periods);
+}
+
+export async function getCompanyEvents(
+  id: string,
+  params: { limit?: number; cursor?: string; types?: string[]; severity?: string; sentiment?: string } = {}
+) {
+  if (!USE_MOCKS) {
+    const { getCompanyEvents } = await import("@/api/companies");
+    return getCompanyEvents(id, params);
+  }
+  const profile = await getCompanyById(id);
+  let events = profile.events;
+  if (params.types && params.types.length) {
+    events = events.filter(e => params.types!.includes(e.type));
+  }
+  if (params.severity) {
+    events = events.filter(e => e.severity === params.severity);
+  }
+  const limit = params.limit ?? 20;
+  const start = params.cursor ? parseInt(params.cursor, 10) : 0;
+  const items = events.slice(start, start + limit);
+  const next = start + limit < events.length ? String(start + limit) : undefined;
+  return { items, cursor_next: next };
+}

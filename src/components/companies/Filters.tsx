@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { companiesFacetOptions } from "@/services/mockCompanies";
+import { USE_MOCKS } from "@/lib/runtime";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { CompaniesQuery } from "@/types/companies";
 
@@ -19,6 +19,8 @@ export default function Filters({ value, onChange, onSearch, rightSlot }: Props)
     value.risk_min ?? 0,
     value.risk_max ?? 100
   ]);
+
+  const facets = { sectors: ['Banks','Energy','Telecom','Materials','Consumer'], countries: ['KSA','UAE','Egypt'], exchanges: ['Tadawul','DFM','EGX'] };
 
   return (
     <div className="rounded-xl border bg-card p-3">
@@ -38,7 +40,7 @@ export default function Filters({ value, onChange, onSearch, rightSlot }: Props)
             <SelectTrigger><SelectValue placeholder="All" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {companiesFacetOptions.sectors.map(s=>(
+              {facets.sectors.map(s=>(
                 <SelectItem key={s} value={s}>{s}</SelectItem>
               ))}
             </SelectContent>
@@ -51,7 +53,7 @@ export default function Filters({ value, onChange, onSearch, rightSlot }: Props)
             <SelectTrigger><SelectValue placeholder="All" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {companiesFacetOptions.countries.map(s=>(
+              {facets.countries.map(s=>(
                 <SelectItem key={s} value={s}>{s}</SelectItem>
               ))}
             </SelectContent>
@@ -64,7 +66,7 @@ export default function Filters({ value, onChange, onSearch, rightSlot }: Props)
             <SelectTrigger><SelectValue placeholder="All" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {companiesFacetOptions.exchanges.map(s=>(
+              {facets.exchanges.map(s=>(
                 <SelectItem key={s} value={s}>{s}</SelectItem>
               ))}
             </SelectContent>
@@ -96,4 +98,3 @@ export default function Filters({ value, onChange, onSearch, rightSlot }: Props)
     </div>
   );
 }
-

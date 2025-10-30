@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import type { Watchlist } from '@/types/watchlists';
-import { listWatchlists, createWatchlist, getWatchlistRollups, removeCompanyFromWatchlist } from '@/services/mockWatchlists';
+import type { Watchlist, WatchlistRollups } from '@/types/watchlists';
+import { USE_MOCKS } from '@/lib/runtime';
+import { useSelection } from '@/contexts/SelectionContext';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function WatchlistsPage() {
   const [lists, setLists] = useState<Watchlist[]>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
   const [name, setName] = useState('');
-  const [roll, setRoll] = useState<Awaited<ReturnType<typeof getWatchlistRollups>> | null>(null);
+  const [roll, setRoll] = useState<WatchlistRollups | null>(null);
   const [loading, setLoading] = useState(false);
+  const { selectedIds } = useSelection();
+  const { toast } = useToast();
 
   async function refreshLists() {
-    const x = await listWatchlists();
+    const wl = USE_MOCKS ? await import('@/services/mockWatchlists') : await import('@/api/watchlists');
+    const x = await wl.listWatchlists();
     setLists(x);
     if (!activeId && x[0]) setActiveId(x[0].id);
   }
@@ -20,6 +25,8 @@ export default function WatchlistsPage() {
     if (!id) return;
     setLoading(true);
     try {
+      // rollups are only available in mock for now
+      const { getWatchlistRollups } = await import('@/services/mockWatchlists');
       const r = await getWatchlistRollups(id);
       setRoll(r);
     } finally {
@@ -55,7 +62,12 @@ export default function WatchlistsPage() {
               className="h-10 rounded-md bg-primary px-3 text-sm text-primary-foreground"
               onClick={async ()=>{
                 if (!name.trim()) return;
-                await createWatchlist(name.trim());
+                if (USE_MOCKS) {
+                  const { createWatchlist } = await import('@/services/mockWatchlists');
+                  await createWatchlist(name.trim());
+                } else {
+                  // no API create endpoint yet
+                }
                 setName('');
                 await refreshLists();
               }}
@@ -69,6 +81,29 @@ export default function WatchlistsPage() {
               disabled={!activeId || loading}
             >
               {loading ? 'Loading…' : 'Refresh'}
+            </button>
+            <button
+              className="h-10 rounded-md bg-primary px-3 text-sm text-primary-foreground"
+              disabled={!activeId || selectedIds.length === 0}
+              onClick={async ()=>{
+                if (!activeId) return;
+                if (selectedIds.length === 0) { toast({ description: 'No selected companies.' }); return; }
+                try {
+                  if (USE_MOCKS) {
+                    const { addCompaniesToWatchlist } = await import('@/services/mockWatchlists');
+                    await addCompaniesToWatchlist(activeId, selectedIds);
+                  } else {
+                    const { addCompaniesToWatchlist } = await import('@/api/watchlists');
+                    await addCompaniesToWatchlist(activeId, selectedIds);
+                  }
+                  toast({ description: `Added ${selectedIds.length} companies.` });
+                  await refreshRollups(activeId);
+                } catch (e:any) {
+                  toast({ description: e?.message || 'Failed to add companies' });
+                }
+              }}
+            >
+              Add Selected
             </button>
           </div>
         </div>
@@ -125,6 +160,7 @@ export default function WatchlistsPage() {
                       className="h-8 rounded-md border px-3 text-xs"
                       onClick={async()=>{
                         if (!activeId) return;
+                        const { removeCompanyFromWatchlist } = await import('@/services/mockWatchlists');
                         await removeCompanyFromWatchlist(activeId, r.id);
                         await refreshRollups(activeId);
                       }}
