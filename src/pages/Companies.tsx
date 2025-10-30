@@ -89,8 +89,8 @@ export default function CompaniesPageSafe() {
     isFetching,
   } = useInfiniteQuery({
     queryKey: ['companies', filters],
-    queryFn: ({ pageParam }) => api.listCompanies({ ...filters, cursor: pageParam, limit: 25 }),
-    initialPageParam: 0 as number,
+    queryFn: ({ pageParam }) => api.listCompanies({ ...filters, cursor: pageParam as string, limit: 25 }),
+    initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => (last as any)?.cursor_next,
     enabled: true,
   });
