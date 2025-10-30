@@ -14,26 +14,55 @@ type Props = {
 
 export default function EventsFeed({ items, loading, hasMore, onLoadMore }: Props) {
   const { t } = useTranslation();
+  
+  const getSeverityColor = (severity: string) => {
+    switch (severity.toLowerCase()) {
+      case 'critical': return 'destructive';
+      case 'high': return 'destructive';
+      case 'medium': return 'default';
+      case 'low': return 'secondary';
+      default: return 'outline';
+    }
+  };
+
+  const getSentimentColor = (sentiment: string) => {
+    switch (sentiment.toLowerCase()) {
+      case 'positive': return 'default';
+      case 'negative': return 'destructive';
+      default: return 'outline';
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">{t('dashboard.recentEvents')}</CardTitle>
+    <Card className="border-none shadow-lg">
+      <CardHeader className="pb-4 border-b">
+        <CardTitle className="text-xl font-bold flex items-center gap-2">
+          <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+          {t('dashboard.recentEvents')}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 pt-4">
         {items.map(ev => (
-          <div key={ev.id} className="rounded-lg border p-3">
-            <div className="flex items-center justify-between">
-              <div className="font-medium">{ev.company}</div>
-              <div className="flex gap-2">
-                <Badge variant="secondary">{ev.type}</Badge>
-                <Badge>{ev.severity}</Badge>
-                <Badge variant="outline">{ev.sentiment}</Badge>
+          <div 
+            key={ev.id} 
+            className="rounded-lg border bg-card hover:bg-accent/50 p-4 transition-all duration-200 hover:shadow-md"
+          >
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="font-semibold text-lg">{ev.company}</div>
+              <div className="flex gap-2 flex-wrap justify-end">
+                <Badge variant="secondary" className="text-xs">{ev.type}</Badge>
+                <Badge variant={getSeverityColor(ev.severity) as any} className="text-xs">
+                  {ev.severity}
+                </Badge>
+                <Badge variant={getSentimentColor(ev.sentiment) as any} className="text-xs">
+                  {ev.sentiment}
+                </Badge>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs text-muted-foreground mb-2">
               {new Date(ev.time).toLocaleString()} • {ev.source}
             </div>
-            <div className="mt-1 text-sm">{ev.summary}</div>
+            <div className="text-sm leading-relaxed">{ev.summary}</div>
           </div>
         ))}
 

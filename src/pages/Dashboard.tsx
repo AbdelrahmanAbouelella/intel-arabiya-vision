@@ -71,50 +71,63 @@ const Dashboard = () => {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
+      <div className="space-y-8 pb-8">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            {t('dashboard.title')}
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Real-time corporate intelligence and market insights
+          </p>
         </div>
 
         {/* KPI Cards */}
         {loadingKpis ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
             {Array.from({length:5}).map((_,i)=>
-              <Skeleton key={i} className="h-24 w-full rounded-xl" />
+              <Skeleton key={i} className="h-32 w-full rounded-xl" />
             )}
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
             {kpis?.map(k => <KpiCard key={k.key} kpi={k} />)}
           </div>
         )}
 
         {/* Market Risk Index */}
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('dashboard.marketRiskIndex')}</CardTitle>
+          <Card className="border-none shadow-lg bg-gradient-card backdrop-blur-sm">
+            <CardHeader className="border-b">
+              <CardTitle className="text-xl font-bold">{t('dashboard.marketRiskIndex')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-center h-64">
                 {loadingRisk ? (
-                  <div className="w-40">
-                    <Skeleton className="h-10 w-full mb-2" />
-                    <Skeleton className="h-4 w-3/4" />
+                  <div className="w-40 space-y-3">
+                    <Skeleton className="h-16 w-full mb-2" />
+                    <Skeleton className="h-4 w-3/4 mx-auto" />
                   </div>
                 ) : (
-                  <div className="text-center">
-                    <div className="text-6xl font-bold text-warning mb-2">{risk}</div>
-                    <p className="text-muted-foreground">{/* Optionally map risk value to label */}</p>
+                  <div className="text-center space-y-4">
+                    <div className="relative inline-block">
+                      <div className="text-7xl font-bold text-warning drop-shadow-glow">
+                        {risk}
+                      </div>
+                      <div className="absolute inset-0 blur-xl opacity-30 bg-warning rounded-full" />
+                    </div>
+                    <p className="text-sm text-muted-foreground uppercase tracking-wide">
+                      Market volatility indicator
+                    </p>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('dashboard.topRiskCompanies')}</CardTitle>
+          <Card className="border-none shadow-lg bg-gradient-card backdrop-blur-sm">
+            <CardHeader className="border-b">
+              <CardTitle className="text-xl font-bold">{t('dashboard.topRiskCompanies')}</CardTitle>
             </CardHeader>
             <CardContent>
               {/* TODO: replace with real Sector/Country treemap once ClickHouse/OpenSearch ready. */}

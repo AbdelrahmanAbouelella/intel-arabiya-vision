@@ -52,23 +52,33 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-gradient-primary opacity-5" />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      
       <Button
         variant="ghost"
         size="sm"
         onClick={toggleLanguage}
-        className="absolute top-4 right-4"
+        className="absolute top-4 right-4 z-10 hover:bg-card/80 backdrop-blur-sm"
       >
         <GlobeAltIcon className="h-5 w-5 mr-2" />
         {language === 'en' ? 'العربية' : 'English'}
       </Button>
 
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="space-y-1">
+      <Card className="w-full max-w-md shadow-2xl border-none bg-card/80 backdrop-blur-xl z-10">
+        <CardHeader className="space-y-3 pb-6">
+          <div className="flex justify-center mb-2">
+            <div className="h-16 w-16 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-glow">
+              <span className="text-3xl font-bold text-white">CI</span>
+            </div>
+          </div>
           <CardTitle className="text-3xl font-bold text-center bg-gradient-primary bg-clip-text text-transparent">
             Corporate Intelligence
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-base">
             {isSignUp ? t('auth.createAccount') : t('auth.signInToContinue')}
           </CardDescription>
         </CardHeader>
@@ -112,17 +122,17 @@ const Auth = () => {
             </div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-gradient-primary hover:opacity-90 transition-opacity shadow-lg text-lg py-6"
               disabled={loading}
             >
               {loading ? t('common.loading') : (isSignUp ? t('auth.signUp') : t('auth.signIn'))}
             </Button>
           </form>
 
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-6 text-center text-sm">
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-primary hover:underline"
+              className="text-primary hover:underline font-medium"
               disabled={loading}
             >
               {isSignUp ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount')}
